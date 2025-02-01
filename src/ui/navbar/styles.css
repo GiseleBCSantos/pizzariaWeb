@@ -1,0 +1,29 @@
+.app-nav {
+  background-color: #b91c1c;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem 0.5rem 0 0;
+  z-index: 99;
+}
+
+.app-nav a {
+  background-color: transparent;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.app-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-nav a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
