@@ -4,6 +4,7 @@ import "./styles.css";
 import { usePizzaria } from "../../modules/views/hooks/usePizzaria";
 import { useState } from "react";
 import { Modal } from "../modal";
+import { toast } from "react-toastify";
 
 const CardPedido = ({ pedido, setPedidoDetalhado }: any) => {
   const { removePedidos } = usePizzaria();
@@ -13,9 +14,14 @@ const CardPedido = ({ pedido, setPedidoDetalhado }: any) => {
     setPedidoDetalhado(pedido);
   };
 
-  const deletePedido = (id: any) => {
-    removePedidos(id);
-    setIsModalOpen(false);
+  const deletePedido = async (id: any) => {
+    try {
+      await removePedidos(id);
+      setIsModalOpen(false);
+      toast("Pedido excluido com sucesso!", { type: "success" });
+    } catch (error: any) {
+      toast(error.message, { type: "error" });
+    }
   };
 
   const openModal = () => {
