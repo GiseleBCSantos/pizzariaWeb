@@ -89,7 +89,7 @@ export const PizzariaProvider = ({ children }: any) => {
   const addPedidos = useCallback(async (pedidoData: any) => {
     try {
       const request = {
-        endpoint: "pedido/add/",
+        endpoint: "pedido/",
         config: {
           method: "POST",
           data: JSON.stringify(pedidoData),
@@ -123,7 +123,7 @@ export const PizzariaProvider = ({ children }: any) => {
   const addItemPizza = useCallback(async (itemPedidoData: any) => {
     try {
       const request = {
-        endpoint: "itempedido/add/",
+        endpoint: "itempedido/",
         config: {
           method: "POST",
           data: JSON.stringify(itemPedidoData),
