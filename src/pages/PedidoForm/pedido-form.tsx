@@ -15,6 +15,7 @@ import { Textarea } from "../../ui/textarea";
 import "./styles.css";
 import { usePizzaria } from "../../modules/views/hooks/usePizzaria";
 import { toast } from "react-toastify";
+import { ClienteForm } from "../../ui/clienteForm";
 
 interface PizzaItem {
   id_pizza: string;
@@ -26,7 +27,6 @@ const PedidoForm = () => {
   const {
     clientes,
     getClientes,
-    addCliente,
     tamanhos,
     getTamanhos,
     pizzas,
@@ -35,16 +35,12 @@ const PedidoForm = () => {
     addItemPizza,
   } = usePizzaria();
 
+  const [mostrarFormularioCliente, setMostrarFormularioCliente] =
+    useState(false);
+  const [clienteSelecionado, setClienteSelecionado] = useState("");
   const [itensPedido, setItensPedido] = useState<PizzaItem[]>([
     { id_pizza: "", id_tamanho: "", quantidade: 1 },
   ]);
-
-  const [clienteAdicionado, setClienteAdicionado] = useState({
-    nome: "",
-    endereco: "",
-    telefone: "",
-    bairro: "",
-  });
 
   const clientesSelect = clientes.map((cliente: any) => ({
     label: cliente.nome,
@@ -58,16 +54,6 @@ const PedidoForm = () => {
     label: pizza.sabor,
     value: pizza.id,
   }));
-
-  useEffect(() => {
-    getClientes();
-    getTamanhos();
-    getPizzas();
-  }, []);
-
-  const [mostrarFormularioCliente, setMostrarFormularioCliente] =
-    useState(false);
-  const [clienteSelecionado, setClienteSelecionado] = useState("");
 
   const adicionarPizza = (e: FormEvent) => {
     e.preventDefault();
@@ -96,34 +82,14 @@ const PedidoForm = () => {
     });
   };
 
-  const adicionarCliente = async () => {
-    try {
-      await addCliente(clienteAdicionado);
-      setMostrarFormularioCliente(false);
-      setClienteAdicionado({
-        nome: "",
-        endereco: "",
-        telefone: "",
-        bairro: "",
-      });
-    } catch (error: any) {
-      toast(error.message, {
-        type: "error",
-        position: "top-center",
-      });
-    }
-  };
-
   const adicionarPedido = async (e: SubmitEvent) => {
     e.preventDefault();
     try {
-      // 1° criar o pedido
       if (itensPedido[0].id_pizza && itensPedido[0].id_tamanho) {
         const pedidoCriado = await addPedidos({
           cliente: clienteSelecionado,
         });
 
-        // 2° iterar sobre a lista itensPedido, criando um item pedido pra cada e vinculando ao cliente
         await Promise.all(
           itensPedido.map(async (itemPedido: any) => {
             await addItemPizza({
@@ -135,6 +101,8 @@ const PedidoForm = () => {
           })
         );
         toast("Pedido criado com sucesso!", { type: "success" });
+        setClienteSelecionado("");
+        setItensPedido([{ id_pizza: "", id_tamanho: "", quantidade: 1 }]);
       } else {
         throw new Error("Um pedido deve ter ao menos um item.");
       }
@@ -145,9 +113,14 @@ const PedidoForm = () => {
     }
   };
 
+  useEffect(() => {
+    getClientes();
+    getTamanhos();
+    getPizzas();
+  }, []);
+
   return (
     <div className="pedido-form-container">
-      {/* <div className="pedido-form-background"></div> */}
       <div className="pedido-form-content">
         <h1 className="pedido-form-title">
           <Pizza className="pedido-form-icon" /> Novo Pedido
@@ -179,84 +152,9 @@ const PedidoForm = () => {
                 </Button>
               </div>
             ) : (
-              <div className="novo-cliente">
-                <div className="form-row">
-                  <div>
-                    <Label htmlFor="nome">Nome</Label>
-                    <Input
-                      id="nome"
-                      placeholder="Nome do cliente"
-                      value={clienteAdicionado.nome}
-                      onChange={(e) =>
-                        setClienteAdicionado({
-                          ...clienteAdicionado,
-                          nome: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="telefone">Telefone</Label>
-                    <Input
-                      id="telefone"
-                      placeholder="(00) 00000-0000"
-                      value={clienteAdicionado.telefone}
-                      onChange={(e) =>
-                        setClienteAdicionado({
-                          ...clienteAdicionado,
-                          telefone: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div>
-                    <Label htmlFor="endereco">Endereço</Label>
-                    <Input
-                      id="endereco"
-                      placeholder="Rua, número"
-                      value={clienteAdicionado.endereco}
-                      onChange={(e) =>
-                        setClienteAdicionado({
-                          ...clienteAdicionado,
-                          endereco: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bairro">Bairro</Label>
-                    <Input
-                      id="bairro"
-                      placeholder="Bairro"
-                      value={clienteAdicionado.bairro}
-                      onChange={(e) =>
-                        setClienteAdicionado({
-                          ...clienteAdicionado,
-                          bairro: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <Button
-                    type="button"
-                    onClick={() => setMostrarFormularioCliente(false)}
-                    className="full-width btn-outline"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => adicionarCliente()}
-                    className="full-width btn-primary"
-                  >
-                    Cadastrar
-                  </Button>
-                </div>
-              </div>
+              <ClienteForm
+                setMostrarFormularioCliente={setMostrarFormularioCliente}
+              />
             )}
           </div>
 
