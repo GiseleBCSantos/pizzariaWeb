@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./styles.css";
+import { usePizzaria } from "../../modules/views/hooks/usePizzaria";
+import { CardPedido } from "../../ui/cardPedido";
 
 interface Pizza {
   sabor: string;
@@ -9,94 +11,76 @@ interface Pizza {
 
 interface Pedido {
   id: number;
-  cliente: string;
+  cliente_nome: string;
   pizzas: Pizza[];
-  total: number;
-  data: string;
+  valor_total: number;
+  data_pedido: string;
   status: string;
+  itens_pedidos: { [key: string]: string | number }[];
 }
 
-const pedidosMock: Pedido[] = [
-  {
-    id: 1,
-    cliente: "João Silva",
-    pizzas: [
-      { sabor: "Margherita", tamanho: "M", quantidade: 2 },
-      { sabor: "Pepperoni", tamanho: "G", quantidade: 1 },
-    ],
-    total: 85.0,
-    data: "2023-05-15",
-    status: "Entregue",
-  },
-  {
-    id: 2,
-    cliente: "Maria Santos",
-    pizzas: [
-      { sabor: "Quatro Queijos", tamanho: "G", quantidade: 1 },
-      { sabor: "Frango com Catupiry", tamanho: "M", quantidade: 1 },
-    ],
-    total: 75.0,
-    data: "2023-05-16",
-    status: "Em preparo",
-  },
-];
-
 const PedidosLista = () => {
-  const [pedidos, setPedidos] = useState<Pedido[]>(pedidosMock);
-  const [pedidoDetalhado, setPedidoDetalhado] = useState<Pedido | null>(null);
+  // const [pedidos, setPedidos] = useState<Pedido[]>(pedidosMock);
+  const { pedidos, getPedidos } = usePizzaria();
 
-  const verDetalhes = (pedido: Pedido) => {
-    setPedidoDetalhado(pedido);
-  };
+  useEffect(() => {
+    getPedidos();
+  }, []);
+
+  const [pedidoDetalhado, setPedidoDetalhado] = useState<Pedido | null>(null);
 
   return (
     <div className="pedidos-lista-container">
-      {/* <div className="pedido-form-background"></div> */}
       <h1 className="pedidos-lista-titulo">Lista de Pedidos</h1>
       <div className="pedidos-grid">
-        {pedidos.map((pedido) => (
-          <div key={pedido.id} className="pedido-card">
-            <h2>Pedido #{pedido.id}</h2>
-            <p>
-              <strong>Cliente:</strong> {pedido.cliente}
-            </p>
-            <p>
-              <strong>Total:</strong> R$ {pedido.total.toFixed(2)}
-            </p>
-            <p>
-              <strong>Data:</strong> {pedido.data}
-            </p>
-            <p>
-              <strong>Status:</strong> {pedido.status}
-            </p>
-            <button
-              onClick={() => verDetalhes(pedido)}
-              className="btn-detalhes"
-            >
-              Ver Detalhes
-            </button>
-          </div>
-        ))}
+        {pedidos &&
+          pedidos.map((pedido: any) => (
+            <div key={pedido.id} className="pedido-card">
+              <CardPedido
+                pedido={pedido}
+                setPedidoDetalhado={setPedidoDetalhado}
+              />
+              {/* <h2>Pedido #{pedido.id}</h2>
+              <p>
+                <strong>Cliente:</strong> {pedido.cliente_nome}
+              </p>
+              <p>
+                <strong>Total:</strong> R$ {pedido.valor_total}
+              </p>
+              <p>
+                <strong>Data:</strong> {pedido.data_pedido}
+              </p>
+              <p>
+                <strong>Status:</strong> {pedido.status}
+              </p>
+              <button
+                onClick={() => verDetalhes(pedido)}
+                className="btn-detalhes"
+              >
+                Ver Detalhes
+              </button> */}
+            </div>
+          ))}
       </div>
       {pedidoDetalhado && (
         <div className="pedido-detalhes">
           <h2>Detalhes do Pedido #{pedidoDetalhado.id}</h2>
           <p>
-            <strong>Cliente:</strong> {pedidoDetalhado.cliente}
+            <strong>Cliente:</strong> {pedidoDetalhado.cliente_nome}
           </p>
           <h3>Pizzas:</h3>
           <ul>
-            {pedidoDetalhado.pizzas.map((pizza, index) => (
+            {pedidoDetalhado.itens_pedidos.map((pizza, index) => (
               <li key={index}>
-                {pizza.quantidade}x {pizza.sabor} ({pizza.tamanho})
+                {pizza.quantidade}x {pizza.pizza_nome} ({pizza.tamanho_nome})
               </li>
             ))}
           </ul>
           <p>
-            <strong>Total:</strong> R$ {pedidoDetalhado.total.toFixed(2)}
+            <strong>Total:</strong> R$ {pedidoDetalhado.valor_total}
           </p>
           <p>
-            <strong>Data:</strong> {pedidoDetalhado.data}
+            <strong>Data:</strong> {pedidoDetalhado.data_pedido}
           </p>
           <p>
             <strong>Status:</strong> {pedidoDetalhado.status}

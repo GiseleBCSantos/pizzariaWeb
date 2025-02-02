@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   Pizza,
   User,
@@ -13,32 +13,75 @@ import { Label } from "../../ui/label";
 import { Select } from "../../ui/select";
 import { Textarea } from "../../ui/textarea";
 import "./styles.css";
+import { usePizzaria } from "../../modules/views/hooks/usePizzaria";
+import { toast } from "react-toastify";
 
 interface PizzaItem {
-  sabor: string;
-  tamanho: string;
+  id_pizza: string;
+  id_tamanho: string;
   quantidade: number;
 }
 
 const PedidoForm = () => {
-  const [pizzas, setPizzas] = useState<PizzaItem[]>([
-    { sabor: "", tamanho: "", quantidade: 1 },
+  const {
+    clientes,
+    getClientes,
+    addCliente,
+    tamanhos,
+    getTamanhos,
+    pizzas,
+    getPizzas,
+    addPedidos,
+    addItemPizza,
+  } = usePizzaria();
+
+  const [itensPedido, setItensPedido] = useState<PizzaItem[]>([
+    { id_pizza: "", id_tamanho: "", quantidade: 1 },
   ]);
+
+  const [clienteAdicionado, setClienteAdicionado] = useState({
+    nome: "",
+    endereco: "",
+    telefone: "",
+    bairro: "",
+  });
+
+  const clientesSelect = clientes.map((cliente: any) => ({
+    label: cliente.nome,
+    value: cliente.id,
+  }));
+  const tamanhosSelect = tamanhos.map((tamanho: any) => ({
+    label: tamanho.nome,
+    value: tamanho.id,
+  }));
+  const pizzasSelect = pizzas.map((pizza: any) => ({
+    label: pizza.sabor,
+    value: pizza.id,
+  }));
+
+  useEffect(() => {
+    getClientes();
+    getTamanhos();
+    getPizzas();
+  }, []);
+
   const [mostrarFormularioCliente, setMostrarFormularioCliente] =
     useState(false);
   const [clienteSelecionado, setClienteSelecionado] = useState("");
 
   const adicionarPizza = (e: FormEvent) => {
     e.preventDefault();
-    setPizzas((pizzasAtuais) => [
+    setItensPedido((pizzasAtuais) => [
       ...pizzasAtuais,
-      { sabor: "", tamanho: "", quantidade: 1 },
+      { id_pizza: "", id_tamanho: "", quantidade: 1 },
     ]);
   };
 
   const removerPizza = (e: FormEvent, index: number) => {
     e.preventDefault();
-    setPizzas((pizzasAtuais) => pizzasAtuais.filter((_, i) => i !== index));
+    setItensPedido((pizzasAtuais) =>
+      pizzasAtuais.filter((_, i) => i !== index)
+    );
   };
 
   const atualizarPizza = (
@@ -46,11 +89,60 @@ const PedidoForm = () => {
     campo: keyof PizzaItem,
     valor: string | number
   ) => {
-    setPizzas((pizzasAtuais) => {
+    setItensPedido((pizzasAtuais) => {
       const novasPizzas = [...pizzasAtuais];
       novasPizzas[index] = { ...novasPizzas[index], [campo]: valor };
       return novasPizzas;
     });
+  };
+
+  const adicionarCliente = async () => {
+    try {
+      await addCliente(clienteAdicionado);
+      setMostrarFormularioCliente(false);
+      setClienteAdicionado({
+        nome: "",
+        endereco: "",
+        telefone: "",
+        bairro: "",
+      });
+    } catch (error: any) {
+      toast(error.message, {
+        type: "error",
+        position: "top-center",
+      });
+    }
+  };
+
+  const adicionarPedido = async (e: SubmitEvent) => {
+    e.preventDefault();
+    try {
+      // 1° criar o pedido
+      if (itensPedido[0].id_pizza && itensPedido[0].id_tamanho) {
+        const pedidoCriado = await addPedidos({
+          cliente: clienteSelecionado,
+        });
+
+        // 2° iterar sobre a lista itensPedido, criando um item pedido pra cada e vinculando ao cliente
+        await Promise.all(
+          itensPedido.map(async (itemPedido: any) => {
+            await addItemPizza({
+              ...itemPedido,
+              pedido: pedidoCriado.id,
+              id_pizza: Number(itemPedido.id_pizza),
+              id_tamanho: Number(itemPedido.id_tamanho),
+            });
+          })
+        );
+        toast("Pedido criado com sucesso!", { type: "success" });
+      } else {
+        throw new Error("Um pedido deve ter ao menos um item.");
+      }
+    } catch (error: any) {
+      toast(error.message, {
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -72,11 +164,7 @@ const PedidoForm = () => {
                   <Label htmlFor="cliente-cadastrado">Cliente Cadastrado</Label>
                   <Select
                     id="cliente-cadastrado"
-                    options={[
-                      { value: "1", label: "João Silva" },
-                      { value: "2", label: "Maria Santos" },
-                      { value: "3", label: "Carlos Oliveira" },
-                    ]}
+                    options={clientesSelect}
                     placeholder="Selecione um cliente"
                     value={clienteSelecionado}
                     onChange={(value) => setClienteSelecionado(value)}
@@ -95,24 +183,79 @@ const PedidoForm = () => {
                 <div className="form-row">
                   <div>
                     <Label htmlFor="nome">Nome</Label>
-                    <Input id="nome" placeholder="Nome do cliente" />
+                    <Input
+                      id="nome"
+                      placeholder="Nome do cliente"
+                      value={clienteAdicionado.nome}
+                      onChange={(e) =>
+                        setClienteAdicionado({
+                          ...clienteAdicionado,
+                          nome: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                   <div>
                     <Label htmlFor="telefone">Telefone</Label>
-                    <Input id="telefone" placeholder="(00) 00000-0000" />
+                    <Input
+                      id="telefone"
+                      placeholder="(00) 00000-0000"
+                      value={clienteAdicionado.telefone}
+                      onChange={(e) =>
+                        setClienteAdicionado({
+                          ...clienteAdicionado,
+                          telefone: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="endereco">Endereço</Label>
-                  <Input id="endereco" placeholder="Rua, número, bairro" />
+                <div className="form-row">
+                  <div>
+                    <Label htmlFor="endereco">Endereço</Label>
+                    <Input
+                      id="endereco"
+                      placeholder="Rua, número"
+                      value={clienteAdicionado.endereco}
+                      onChange={(e) =>
+                        setClienteAdicionado({
+                          ...clienteAdicionado,
+                          endereco: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bairro">Bairro</Label>
+                    <Input
+                      id="bairro"
+                      placeholder="Bairro"
+                      value={clienteAdicionado.bairro}
+                      onChange={(e) =>
+                        setClienteAdicionado({
+                          ...clienteAdicionado,
+                          bairro: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => setMostrarFormularioCliente(false)}
-                  className="btn-outline full-width"
-                >
-                  Cancelar
-                </Button>
+                <div className="form-row">
+                  <Button
+                    type="button"
+                    onClick={() => setMostrarFormularioCliente(false)}
+                    className="full-width btn-outline"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => adicionarCliente()}
+                    className="full-width btn-primary"
+                  >
+                    Cadastrar
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -121,16 +264,17 @@ const PedidoForm = () => {
             <h2 className="section-title">
               <ShoppingCart className="section-icon" /> Pizzas
             </h2>
-            {pizzas.map((pizza, index) => (
+            {itensPedido.map((pizza, index) => (
               <div key={index} className="pizza-item">
                 <div>
                   <Label htmlFor={`sabor-${index}`}>Sabor</Label>
-                  <Input
+                  <Select
                     id={`sabor-${index}`}
-                    placeholder="Ex: Margherita"
-                    value={pizza.sabor}
-                    onChange={(e) =>
-                      atualizarPizza(index, "sabor", e.target.value)
+                    options={pizzasSelect}
+                    placeholder="Selecione o sabor"
+                    value={pizza.id_pizza}
+                    onChange={(value) =>
+                      atualizarPizza(index, "id_pizza", value)
                     }
                   />
                 </div>
@@ -138,15 +282,11 @@ const PedidoForm = () => {
                   <Label htmlFor={`tamanho-${index}`}>Tamanho</Label>
                   <Select
                     id={`tamanho-${index}`}
-                    options={[
-                      { value: "p", label: "Pequena" },
-                      { value: "m", label: "Média" },
-                      { value: "g", label: "Grande" },
-                    ]}
+                    options={tamanhosSelect}
                     placeholder="Selecione"
-                    value={pizza.tamanho}
+                    value={pizza.id_tamanho}
                     onChange={(value) =>
-                      atualizarPizza(index, "tamanho", value)
+                      atualizarPizza(index, "id_tamanho", value)
                     }
                   />
                 </div>
@@ -195,7 +335,11 @@ const PedidoForm = () => {
             />
           </div>
 
-          <Button type="submit" className="btn-primary full-width">
+          <Button
+            type="submit"
+            className="btn-primary full-width"
+            onClick={(e: any) => adicionarPedido(e)}
+          >
             Finalizar Pedido
           </Button>
         </form>
