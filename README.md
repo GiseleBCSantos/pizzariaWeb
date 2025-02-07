@@ -48,7 +48,7 @@ O atendente pode adicionar itens ao pedido (pizzas com diferentes tamanhos e qua
   npm install
 ```
 
-# 3. **Rodar Projeto**
+### 3. **Rodar Projeto**
 ```bash
   npm run dev
 ```
