@@ -38,13 +38,13 @@ O atendente pode adicionar itens ao pedido (pizzas com diferentes tamanhos e qua
 ### 1. **Clonar o Repositório**
 
 ```bash
-  git clone https://github.com/usuario/pizzaria-web
+  git clone https://github.com/usuario/pizzariaWeb
 ```
 
 ### 2. **Instalar Dependências**
 
 ```bash
-  cd pizzaria-web
+  cd pizzariaWeb
   npm install
 ```
 
