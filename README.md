@@ -1,50 +1,62 @@
-# React + TypeScript + Vite
+# Pizzaria Web System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é um sistema de controle para uma pizzaria de entrega em domicílio, desenvolvido com **React**, **TypeScript** e **Vite**. O sistema permite o cadastro de clientes, a realização de pedidos, o gerenciamento de pizzas (com diferentes tamanhos e sabores), e a visualização dos pedidos realizados.
 
-Currently, two official plugins are available:
+## Tecnologias Utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend**:
+  - [React](https://reactjs.org/)
+  - [TypeScript](https://www.typescriptlang.org/)
+  - [Vite](https://vitejs.dev/) (para build e servidor de desenvolvimento)
+  - [React Router](https://reactrouter.com/)
+  - [Axios](https://axios-http.com/) (para fazer chamadas HTTP)
+  - [React Toastify](https://fkhadra.github.io/react-toastify/) (para notificações)
+  - [Lucide Icons](https://lucide.dev/) (para ícones)
 
-## Expanding the ESLint configuration
+- **Backend**:
+  - API RESTful (baseada na URL `https://pizzariaapi-production.up.railway.app/`)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Banco de Dados**:
+  - Relacional (Usado para armazenar informações sobre clientes, pizzas, pedidos, etc.)
 
-- Configure the top-level `parserOptions` property like this:
+## Funcionalidades
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1. **Cadastro de Clientes**
+O sistema permite cadastrar clientes com as informações de nome, telefone, endereço e bairro.
+
+### 2. **Pedido de Pizzas**
+Os atendentes podem fazer pedidos no sistema, associando um cliente a várias pizzas. As pizzas podem ter diferentes tamanhos (pequena, média ou grandes) e sabores, e o sistema calcula automaticamente o valor total do pedido.
+
+### 3. **Visualização de Pedidos**
+O sistema permite visualizar a lista de pedidos feitos, com detalhes do cliente, pizzas, valor total, data do pedido e status.
+
+### 4. **Criação de Pedido**
+O atendente pode adicionar itens ao pedido (pizzas com diferentes tamanhos e quantidades), editar as informações de sabor e quantidade, e finalizar o pedido.
+
+## Como Rodar o Projeto
+
+### 1. **Clonar o Repositório**
+
+```bash
+  git clone https://github.com/usuario/pizzaria-web
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2. **Instalar Dependências**
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+  cd pizzaria-web
+  npm install
 ```
+
+# 3. **Rodar Projeto**
+```bash
+  npm run dev
+```
+
+## Imagens Ilustrativas
+
+![Tela Inicial](images/tela-inicial.png)
+![Detalhes dos pedidos](images/detalhes.png)
+
+## Link
+  [Clique aqui para acessar o site](https://pizzaria-web-two.vercel.app/)
