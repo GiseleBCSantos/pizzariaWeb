@@ -56,7 +56,10 @@ O atendente pode adicionar itens ao pedido (pizzas com diferentes tamanhos e qua
 ## Imagens Ilustrativas
 
 ![Tela Inicial](images/tela-inicial.png)
+![image](https://github.com/user-attachments/assets/dcde61d9-7da8-4b51-9b03-a2104dbdaf92)
 ![Detalhes dos pedidos](images/detalhes.png)
+**![image](https://github.com/user-attachments/assets/274fae87-60f9-41c4-a342-9605b4964695)
+**
 
 ## Link
   [Clique aqui para acessar o site](https://pizzaria-web-two.vercel.app/)
