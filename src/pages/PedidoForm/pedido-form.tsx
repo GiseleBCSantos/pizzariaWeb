@@ -225,14 +225,6 @@ const PedidoForm = () => {
             </Button>
           </div>
 
-          <div>
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              placeholder="Alguma observação especial?"
-            />
-          </div>
-
           <Button
             type="submit"
             className="btn-primary full-width"
